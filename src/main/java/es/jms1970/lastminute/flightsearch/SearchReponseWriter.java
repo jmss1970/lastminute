@@ -68,7 +68,7 @@ public class SearchReponseWriter {
         int adults = 0, children = 0, infants = 0;
         int numberOfDays = DateUtility.getNumberOfDays(request.getDepartureDate());
 
-        out.println("\From " + request.getOriginAirport().getCity() + " (" + request.getOriginAirport().getIataCode() + ") To "
+        out.println("\nFrom " + request.getOriginAirport().getCity() + " (" + request.getOriginAirport().getIataCode() + ") To "
                 + request.getDestinationAirport().getCity() + "(" + request.getDestinationAirport().getIataCode() + ")");
         out.println("\nDeparture date: " + this.dateFormat.format(request.getDepartureDate()) + ", " + numberOfDays
                 + (numberOfDays > 1 ? " days" : " day") + " to departure time.");
