@@ -69,7 +69,7 @@ public class SearchReponseWriter {
         int numberOfDays = DateUtility.getNumberOfDays(request.getDepartureDate());
 
         out.println("\nFrom " + request.getOriginAirport().getCity() + " (" + request.getOriginAirport().getIataCode() + ") To "
-                + request.getDestinationAirport().getCity() + "(" + request.getDestinationAirport().getIataCode() + ")");
+                + request.getDestinationAirport().getCity() + " (" + request.getDestinationAirport().getIataCode() + ")");
         out.println("\nDeparture date: " + this.dateFormat.format(request.getDepartureDate()) + ", " + numberOfDays
                 + (numberOfDays > 1 ? " days" : " day") + " to departure time.");
         for (PassengerType passenger : request.getPassengers()) {
