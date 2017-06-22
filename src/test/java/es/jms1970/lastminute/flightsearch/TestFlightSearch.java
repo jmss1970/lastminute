@@ -30,29 +30,7 @@ import junit.framework.Assert;
  * 
  * @author jmss1970@gmail.com
  */
-public class TestFlightSearch {    @Test
-    public final void testFlightNotFound() {
-
-        SearchResponse response = null;
-        SearchReponseWriter writer = new SearchReponseWriter();
-        AirportDao airportDao = new AirportDao();
-
-        SearchRequest request = new SearchRequest();
-
-        request.setDepartureDate(new Date(System.currentTimeMillis()));
-        request.setDestinationAirport(airportDao.findByIataCode("IST"));
-        request.setOriginAirport(airportDao.findByIataCode("MAD"));
-        request.addPassengers(PassengerType.ADULT);
-
-        response = this.searcher.searchFlights(request);
-
-        if (!response.getAvailableFlights().isEmpty()) {
-            Assert.fail("Flight does not exist!");
-        }
-        writer.writeResponse(response, System.out);
-
-    }
-
+public class TestFlightSearch {
 
     // List of valid request (different origin and destination airport) loaded from data file
     private List<SearchRequest> requests;
@@ -138,8 +116,17 @@ public class TestFlightSearch {    @Test
             this.searcher.searchFlights(request);
             Assert.fail("Date previous than today must be controlled");
         } catch (DepartureDateException e) {
-
+            System.out.println("Previous date raise and exception");
         }
+        gc.add(GregorianCalendar.DATE, -10);
+        try {
+            this.searcher.searchFlights(request);
+            Assert.fail("Date previous than today must be controlled");
+        } catch (DepartureDateException e) {
+            System.out.println("Previous date raise and exception");
+        }
+
+        request.setDepartureDate(gc.getTime());
 
         gc.add(GregorianCalendar.DATE, 30);
         request.setDepartureDate(gc.getTime());
@@ -240,4 +227,5 @@ public class TestFlightSearch {    @Test
         writer.writeResponse(response, System.out);
 
     }
+
 }
