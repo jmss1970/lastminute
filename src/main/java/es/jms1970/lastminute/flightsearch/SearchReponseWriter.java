@@ -44,13 +44,13 @@ public class SearchReponseWriter {
         out.println("-----------------------------------------------------------------------");
 
         if (response == null) {
-            out.println("No response to write");
+            out.println("\nNo response to write");
         } else if (response.getAvailableFlights().isEmpty()) {
             printRequestString(response.getRequest(), out);
-            out.println("No flights available");
+            out.println("\nNo flights available");
         } else {
             printRequestString(response.getRequest(), out);
-            out.println("Flights:");
+            out.println("\nFlights:");
             for (Flight f : response.getAvailableFlights()) {
                 printFlightString(f, response.getRequest(), response.getPricingRule(), out);
             }
@@ -68,9 +68,9 @@ public class SearchReponseWriter {
         int adults = 0, children = 0, infants = 0;
         int numberOfDays = DateUtility.getNumberOfDays(request.getDepartureDate());
 
-        out.println("From " + request.getOriginAirport().getCity() + "(" + request.getOriginAirport().getIataCode() + ") To "
+        out.println("\From " + request.getOriginAirport().getCity() + " (" + request.getOriginAirport().getIataCode() + ") To "
                 + request.getDestinationAirport().getCity() + "(" + request.getDestinationAirport().getIataCode() + ")");
-        out.println("Departure date: " + this.dateFormat.format(request.getDepartureDate()) + ", " + numberOfDays
+        out.println("\nDeparture date: " + this.dateFormat.format(request.getDepartureDate()) + ", " + numberOfDays
                 + (numberOfDays > 1 ? " days" : " day") + " to departure time.");
         for (PassengerType passenger : request.getPassengers()) {
             switch (passenger) {
@@ -86,7 +86,7 @@ public class SearchReponseWriter {
             }
         }
 
-        out.println("Passengers: ");
+        out.println("\nPassengers: \n");
         if (adults > 0) {
             out.println("\tAdults: " + adults);
         }
