@@ -29,7 +29,29 @@ import junit.framework.Assert;
  * 
  * @author jmss1970@gmail.com
  */
-public class TestFlightSearch {
+public class TestFlightSearch {    @Test
+    public final void testFlightNotFound() {
+
+        SearchResponse response = null;
+        SearchReponseWriter writer = new SearchReponseWriter();
+        AirportDao airportDao = new AirportDao();
+
+        SearchRequest request = new SearchRequest();
+
+        request.setDepartureDate(new Date(System.currentTimeMillis()));
+        request.setDestinationAirport(airportDao.findByIataCode("IST"));
+        request.setOriginAirport(airportDao.findByIataCode("MAD"));
+        request.addPassengers(PassengerType.ADULT);
+
+        response = this.searcher.searchFlights(request);
+
+        if (!response.getAvailableFlights().isEmpty()) {
+            Assert.fail("Flight does not exist!");
+        }
+        writer.writeResponse(response, System.out);
+
+    }
+
 
     // List of valid request (different origin and destination airport) loaded from data file
     private List<SearchRequest> requests;
@@ -195,4 +217,26 @@ public class TestFlightSearch {
 
     }
 
+    @Test
+    public final void testFlightNotFound() {
+
+        SearchResponse response = null;
+        SearchReponseWriter writer = new SearchReponseWriter();
+        AirportDao airportDao = new AirportDao();
+
+        SearchRequest request = new SearchRequest();
+
+        request.setDepartureDate(new Date(System.currentTimeMillis()));
+        request.setDestinationAirport(airportDao.findByIataCode("IST"));
+        request.setOriginAirport(airportDao.findByIataCode("MAD"));
+        request.addPassengers(PassengerType.ADULT);
+
+        response = this.searcher.searchFlights(request);
+
+        if (!response.getAvailableFlights().isEmpty()) {
+            Assert.fail("Flight does not exist!");
+        }
+        writer.writeResponse(response, System.out);
+
+    }
 }
