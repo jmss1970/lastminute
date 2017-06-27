@@ -16,10 +16,13 @@ import es.jms1970.lastminute.flightsearch.bean.SearchRequest;
 import es.jms1970.lastminute.flightsearch.bean.SearchResponse;
 import es.jms1970.lastminute.flightsearch.dao.AirportDao;
 import es.jms1970.lastminute.flightsearch.dao.AirportDaoMethods;
+import es.jms1970.lastminute.flightsearch.dao.loader.AirportLoader;
 import es.jms1970.lastminute.flightsearch.dao.loader.FlightLoader;
 import es.jms1970.lastminute.flightsearch.exception.AirportNotFoundException;
 import es.jms1970.lastminute.flightsearch.exception.DepartureDateException;
+import es.jms1970.lastminute.flightsearch.exception.FlightSearchException;
 import es.jms1970.lastminute.flightsearch.exception.PassengerException;
+import es.jms1970.lastminute.flightsearch.model.Airport;
 import es.jms1970.lastminute.flightsearch.model.Flight;
 import junit.framework.Assert;
 
@@ -39,6 +42,13 @@ public class TestFlightSearch {
     // Just an instance
     private FlightSearcher searcher = new FlightSearcher();
 
+    /**
+     * Loads the map which collects the number of available flights (gruopped vy origin and destination, regardless
+     * airline)
+     * Loads the list of request with all the available flights.
+     * 
+     * @throws Exception
+     */
     @Before
     public void setUp() throws Exception {
 
@@ -177,7 +187,7 @@ public class TestFlightSearch {
 
     @Test
     /**
-     * Proof the searches returns all the available flights
+     * Proof the searches of available flights returns all the available flights
      */
     public final void testFlightSearch() {
 
@@ -205,6 +215,9 @@ public class TestFlightSearch {
 
     }
 
+    /**
+     * Test a not found flight
+     */
     @Test
     public final void testFlightNotFound() {
 
@@ -225,6 +238,66 @@ public class TestFlightSearch {
             Assert.fail("Flight does not exist!");
         }
         writer.writeResponse(response, System.out);
+
+    }
+
+    /**
+     * Tests all the combinations of airports and checks whether there is available flight or not.
+     */
+    @Test
+    public final void testAllChances() {
+
+        SearchResponse response = null;
+        SearchReponseWriter writer = new SearchReponseWriter();
+        AirportLoader aLoader = new AirportLoader();
+        FlightLoader fLoader = new FlightLoader();
+        List<Airport> origin = new ArrayList<Airport>();
+        List<Airport> destination = new ArrayList<Airport>();
+        List<Flight> availableFlights = new ArrayList<Flight>();
+        Boolean found = Boolean.FALSE;
+
+        fLoader.loadFile(ConfigManager.getValue(ApplicationKeys.FLIGHTS_FILE), availableFlights);
+
+        aLoader.loadFile(ConfigManager.getValue(ApplicationKeys.AIRPORTS_FILE), origin);
+        destination.addAll(origin);
+
+        SearchRequest request = new SearchRequest();
+
+        request.setDepartureDate(new Date(System.currentTimeMillis()));
+        request.addPassengers(PassengerType.ADULT);
+
+        for (Airport o : origin) {
+            request.setOriginAirport(o);
+            for (Airport d : destination) {
+                request.setDestinationAirport(d);
+                try {
+                    response = this.searcher.searchFlights(request);
+                    writer.writeResponse(response, System.out);
+
+                    found = Boolean.FALSE;
+                    for (Flight f : availableFlights) {
+                        if (f.getOrigin().equals(o) && f.getDestination().equals(d)) {
+                            found = Boolean.TRUE;
+                            if (response.getAvailableFlights().isEmpty()) {
+                                Assert.fail("Flight not found!");
+                            }
+                            break;
+                        }
+                    }
+
+                    if (!found && !response.getAvailableFlights().isEmpty()) {
+                        Assert.fail("Flight not available found!");
+                    }
+
+                } catch (FlightSearchException f) {
+                    if (!(o.equals(d) && f instanceof AirportNotFoundException)) {
+                        Assert.fail(f.getLocalizedMessage());
+                    }
+                } catch (Exception e) {
+                    Assert.fail(e.getLocalizedMessage());
+                }
+            }
+        }
 
     }
 
