@@ -2,3 +2,9 @@
 language: java
 sudo: false
 script: mvn clean verify
+notifications:
+   email:
+      recipients:
+        - jmss1970@gmail.com
+      on_success: never
+      on_faliure: always
